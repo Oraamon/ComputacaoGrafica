@@ -81,7 +81,7 @@ public class PlayerInteraction : MonoBehaviour
     {
         heldItem = item;
         item.transform.SetParent(transform);
-        item.transform.localPosition = new Vector3(0, 1, 0); // Posição para segurar o item
+        item.transform.localPosition = new Vector3(0, 0, 1); // Posição para segurar o item
     }
 
     public void DropItem(Vector3 position)
