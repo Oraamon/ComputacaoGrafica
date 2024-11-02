@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    public Transform handTransform; 
+    public Transform handTransform;
     private GameObject heldItem = null;
     private GameObject nearbyObject = null;
-    public Text interactionText; 
+    public Text interactionText;
 
     private List<GameObject> interactableObjects = new List<GameObject>();
 
@@ -15,11 +15,11 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (interactionText != null)
         {
-            interactionText.gameObject.SetActive(false); 
+            interactionText.gameObject.SetActive(false);
         }
         else
         {
-            Debug.LogWarning("interactionText não está atribuído. Arraste o Text da UI para o Inspector.");
+            Debug.LogWarning("interactionText não está atribuído.");
         }
     }
 
@@ -29,22 +29,22 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (heldItem == null) 
             {
-                if (nearbyObject.CompareTag("Pickup")) 
+                if (nearbyObject.CompareTag("Pickup"))
                 {
                     PickupItem(nearbyObject);
                 }
-                else if (nearbyObject.TryGetComponent<Container>(out Container container)) 
+                else if (nearbyObject.TryGetComponent<Container>(out Container container))
                 {
                     GameObject itemFromContainer = container.RemoveItem();
                     if (itemFromContainer != null)
                     {
-                        PickupItem(itemFromContainer); 
+                        PickupItem(itemFromContainer);
                     }
                 }
                 
                 if (interactionText != null)
                 {
-                    interactionText.gameObject.SetActive(false); 
+                    interactionText.gameObject.SetActive(false);
                 }
             }
             else 
@@ -57,13 +57,13 @@ public class PlayerInteraction : MonoBehaviour
                         heldItem = null;
                         if (interactionText != null)
                         {
-                            interactionText.gameObject.SetActive(false); 
+                            interactionText.gameObject.SetActive(false);
                         }
                     }
                 }
                 else
                 {
-                    DropItem(transform.position + transform.forward); 
+                    DropItem(transform.position + transform.forward);
                 }
             }
         }
@@ -109,16 +109,16 @@ public class PlayerInteraction : MonoBehaviour
 
     public void PickupItem(GameObject item)
     {
-        if (item != null && handTransform != null && item.CompareTag("Pickup")) 
+        if (item != null && handTransform != null && item.CompareTag("Pickup"))
         {
             heldItem = item;
             item.transform.SetParent(handTransform);
-            item.transform.localPosition = Vector3.zero; 
-            item.transform.localRotation = Quaternion.identity; 
+            item.transform.localPosition = Vector3.zero;
+            item.transform.localRotation = Quaternion.identity;
         }
         else
         {
-            Debug.LogWarning("Tentativa de pegar um item inválido ou objeto sem tag 'Pickup'.");
+            Debug.LogWarning("Tentativa de pegar um item inválido.");
         }
     }
 
