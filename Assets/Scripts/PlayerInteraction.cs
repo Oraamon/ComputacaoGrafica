@@ -58,6 +58,7 @@ public class PlayerInteraction : MonoBehaviour
                         if (interactionText != null)
                         {
                             interactionText.gameObject.SetActive(false); 
+                        }
                     }
                 }
                 else
