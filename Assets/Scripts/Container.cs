@@ -3,28 +3,37 @@ using UnityEngine;
 public class Container : MonoBehaviour
 {
     public GameObject storedItem;
+    public Transform displayPosition; 
 
     public bool CanPlaceItem(GameObject item)
     {
-        // Verifica se pode armazenar o item (exemplo para simplificação)
         return storedItem == null;
     }
 
     public void PlaceItem(GameObject item)
     {
-        if (CanPlaceItem(item))
+        if (CanPlaceItem(item) && displayPosition != null)
         {
             storedItem = item;
-            item.transform.SetParent(transform); // Coloca o item na bancada
-            item.transform.localPosition = new Vector3(0, 1, 0); // Ajuste a posição de exibição
+            item.transform.SetParent(transform); 
+            item.transform.position = displayPosition.position; 
+            item.transform.rotation = displayPosition.rotation; 
+        }
+        else
+        {
+            Debug.LogWarning("Não foi possível colocar o item. Verifique se o DisplayPosition está configurado.");
         }
     }
 
     public GameObject RemoveItem()
     {
-        GameObject item = storedItem;
-        storedItem = null;
-        item.transform.SetParent(null);
-        return item;
+        if (storedItem != null)
+        {
+            GameObject item = storedItem;
+            storedItem = null;
+            item.transform.SetParent(null); 
+            return item;
+        }
+        return null; 
     }
 }

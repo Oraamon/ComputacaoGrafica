@@ -4,28 +4,50 @@ using System.Collections.Generic;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    public GameObject heldItem = null;
+    public Transform handTransform; 
+    private GameObject heldItem = null;
     private GameObject nearbyObject = null;
-    public Text interactionText; // Arraste o Text da UI aqui no Inspector
+    public Text interactionText; 
 
-    // Lista para armazenar todos os objetos interativos dentro dos triggers
     private List<GameObject> interactableObjects = new List<GameObject>();
 
     void Start()
     {
-        interactionText.gameObject.SetActive(false); // Esconde o texto no início
+        if (interactionText != null)
+        {
+            interactionText.gameObject.SetActive(false); 
+        }
+        else
+        {
+            Debug.LogWarning("interactionText não está atribuído. Arraste o Text da UI para o Inspector.");
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && nearbyObject != null)
         {
-            if (heldItem == null) // Pegar o objeto
+            if (heldItem == null) 
             {
-                PickupItem(nearbyObject);
-                interactionText.gameObject.SetActive(false); // Esconde o texto ao pegar o item
+                if (nearbyObject.CompareTag("Pickup")) 
+                {
+                    PickupItem(nearbyObject);
+                }
+                else if (nearbyObject.TryGetComponent<Container>(out Container container)) 
+                {
+                    GameObject itemFromContainer = container.RemoveItem();
+                    if (itemFromContainer != null)
+                    {
+                        PickupItem(itemFromContainer); 
+                    }
+                }
+                
+                if (interactionText != null)
+                {
+                    interactionText.gameObject.SetActive(false); 
+                }
             }
-            else // Soltar o objeto
+            else 
             {
                 if (nearbyObject.TryGetComponent<Container>(out Container container))
                 {
@@ -33,12 +55,14 @@ public class PlayerInteraction : MonoBehaviour
                     {
                         container.PlaceItem(heldItem);
                         heldItem = null;
-                        interactionText.gameObject.SetActive(false); // Esconde o texto ao soltar o item
+                        if (interactionText != null)
+                        {
+                            interactionText.gameObject.SetActive(false); 
                     }
                 }
                 else
                 {
-                    DropItem(transform.position + transform.forward); // Solta o item na frente do jogador
+                    DropItem(transform.position + transform.forward); 
                 }
             }
         }
@@ -46,7 +70,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Interactable"))
+        if (other.CompareTag("Pickup") || other.CompareTag("Interactable"))
         {
             interactableObjects.Add(other.gameObject);
             UpdateNearestObject();
@@ -66,22 +90,35 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (interactableObjects.Count > 0)
         {
-            // Define o objeto mais próximo como o último da lista
             nearbyObject = interactableObjects[interactableObjects.Count - 1];
-            interactionText.gameObject.SetActive(true);
+            if (interactionText != null)
+            {
+                interactionText.gameObject.SetActive(true);
+            }
         }
         else
         {
             nearbyObject = null;
-            interactionText.gameObject.SetActive(false);
+            if (interactionText != null)
+            {
+                interactionText.gameObject.SetActive(false);
+            }
         }
     }
 
     public void PickupItem(GameObject item)
     {
-        heldItem = item;
-        item.transform.SetParent(transform);
-        item.transform.localPosition = new Vector3(0, 0, 1); // Posição para segurar o item
+        if (item != null && handTransform != null && item.CompareTag("Pickup")) 
+        {
+            heldItem = item;
+            item.transform.SetParent(handTransform);
+            item.transform.localPosition = Vector3.zero; 
+            item.transform.localRotation = Quaternion.identity; 
+        }
+        else
+        {
+            Debug.LogWarning("Tentativa de pegar um item inválido ou objeto sem tag 'Pickup'.");
+        }
     }
 
     public void DropItem(Vector3 position)
