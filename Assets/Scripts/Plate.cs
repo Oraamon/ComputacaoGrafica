@@ -4,11 +4,12 @@ using UnityEngine;
 public class Plate : MonoBehaviour
 {
     private List<GameObject> storedItems = new List<GameObject>();
-    public Transform displayPosition;
     public float itemSpacing = 0.3f;
     public float itemHeightOffset = 0.1f;
     public int maxItems = 5;
     private bool canAddItems = false;
+
+    public GameObject carneFritaPrefab; 
 
     public bool CanPlaceItem(GameObject item)
     {
@@ -22,14 +23,51 @@ public class Plate : MonoBehaviour
             storedItems.Add(item);
             item.transform.SetParent(transform);
 
-            // Altera a tag para impedir interação direta
-            item.tag = "StoredOnPlate"; // Define uma tag específica para itens no prato
+            item.tag = "StoredOnPlate";
 
             ArrangeItems();
+            CheckForRecipe();
         }
         else
         {
             Debug.LogWarning("Não foi possível colocar o item no prato.");
+        }
+    }
+
+    private void CheckForRecipe()
+    {
+        bool hasQueijo = false;
+        bool hasCarne = false;
+
+        foreach (GameObject item in storedItems)
+        {
+            if (item.name.Contains("Queijo"))
+            {
+                hasQueijo = true;
+            }
+            else if (item.name.Contains("Carne"))
+            {
+                hasCarne = true;
+            }
+        }
+
+        if (hasQueijo && hasCarne)
+        {
+            foreach (GameObject storedItem in storedItems)
+            {
+                Destroy(storedItem);
+            }
+            storedItems.Clear();
+
+            GameObject newItem = Instantiate(carneFritaPrefab, transform);
+            newItem.transform.localPosition = Vector3.zero; 
+            newItem.transform.localRotation = Quaternion.identity; 
+
+            storedItems.Add(newItem);
+            
+            newItem.tag = "StoredOnPlate";
+
+            ArrangeItems();
         }
     }
 
@@ -40,8 +78,7 @@ public class Plate : MonoBehaviour
             storedItems.Remove(item);
             item.transform.SetParent(null);
 
-            // Restaura a tag original para permitir interação
-            item.tag = "Pickup"; // Altere para a tag original, como "Pickup" ou a tag que você utiliza
+            item.tag = "Pickup";
 
             ArrangeItems();
         }
@@ -49,18 +86,19 @@ public class Plate : MonoBehaviour
 
     private void ArrangeItems()
     {
+    
         float angleStep = 360f / storedItems.Count;
         for (int i = 0; i < storedItems.Count; i++)
         {
             float angle = i * angleStep;
             Vector3 offset = new Vector3(
-                Mathf.Cos(angle * Mathf.Deg2Rad) * itemSpacing,
+                Mathf.Cos(angle * Mathf.Deg2Rad) * itemSpacing - 0.2f, 
                 itemHeightOffset,
                 Mathf.Sin(angle * Mathf.Deg2Rad) * itemSpacing
             );
 
-            storedItems[i].transform.position = displayPosition.position + offset;
-            storedItems[i].transform.rotation = displayPosition.rotation;
+            storedItems[i].transform.localPosition = offset; 
+            storedItems[i].transform.localRotation = Quaternion.identity; 
         }
     }
 
