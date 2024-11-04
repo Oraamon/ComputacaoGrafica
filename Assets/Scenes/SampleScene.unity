@@ -244,9 +244,9 @@ GameObject:
   - component: {fileID: 142603465}
   - component: {fileID: 142603464}
   - component: {fileID: 142603463}
-  - component: {fileID: 142603462}
   - component: {fileID: 142603461}
   - component: {fileID: 142603460}
+  - component: {fileID: 142603467}
   m_Layer: 0
   m_Name: Caixa Queijo
   m_TagString: Interactable
@@ -302,21 +302,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &142603462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142603459}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 144af94f28fe28541b9aec97860e3ef5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  storedItem: {fileID: 0}
-  displayPosition: {fileID: 1997351792}
-  itemPrefab: {fileID: 356321133}
 --- !u!65 &142603463
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -404,6 +389,19 @@ Transform:
   - {fileID: 175642629}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!114 &142603467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142603459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9ce34720b7c7924eb83e86d73eb20de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemPrefab: {fileID: 356321133}
 --- !u!1 &151913149 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3294758251327466535, guid: 1c5dda3c7cd3cf742afcade5419faeab, type: 3}
