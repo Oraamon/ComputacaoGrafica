@@ -5,6 +5,22 @@ public class Container : MonoBehaviour
     public GameObject storedItem;
     public Transform displayPosition;
 
+    public GameObject itemPrefab;
+    public GameObject SpawnItem()
+    {
+        if (itemPrefab != null)
+        {
+            GameObject spawnedItem = Instantiate(itemPrefab);
+            spawnedItem.tag = "Pickup"; // Certifique-se de que o item tenha a tag correta
+            return spawnedItem;
+        }
+        else
+        {
+            Debug.LogWarning("Prefab do item não atribuído.");
+            return null;
+        }
+    }
+
     public bool CanPlaceItem(GameObject item)
     {
         // Permite colocar um item apenas se o container estiver vazio ou se o item for adicionado ao prato.

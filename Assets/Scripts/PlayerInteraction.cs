@@ -35,7 +35,7 @@ public class PlayerInteraction : MonoBehaviour
                 }
                 else if (nearbyObject.TryGetComponent<Container>(out Container container))
                 {
-                    GameObject itemFromContainer = container.RemoveItem();
+                    GameObject itemFromContainer = container.SpawnItem(); // Usando SpawnItem para instanciar o queijo
                     if (itemFromContainer != null)
                     {
                         PickupItem(itemFromContainer);
