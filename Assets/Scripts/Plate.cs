@@ -9,7 +9,7 @@ public class Plate : MonoBehaviour
     public int maxItems = 5;
     private bool canAddItems = false;
 
-    public GameObject carneFritaPrefab; 
+    public GameObject carneFritaPrefab;
 
     public bool CanPlaceItem(GameObject item)
     {
@@ -59,12 +59,14 @@ public class Plate : MonoBehaviour
             }
             storedItems.Clear();
 
+            Debug.Log("carne assada feita");
+
             GameObject newItem = Instantiate(carneFritaPrefab, transform);
-            newItem.transform.localPosition = Vector3.zero; 
-            newItem.transform.localRotation = Quaternion.identity; 
+            newItem.transform.localPosition = Vector3.zero;
+            newItem.transform.localRotation = Quaternion.identity;
 
             storedItems.Add(newItem);
-            
+
             newItem.tag = "StoredOnPlate";
 
             ArrangeItems();
@@ -86,19 +88,19 @@ public class Plate : MonoBehaviour
 
     private void ArrangeItems()
     {
-    
+
         float angleStep = 360f / storedItems.Count;
         for (int i = 0; i < storedItems.Count; i++)
         {
             float angle = i * angleStep;
             Vector3 offset = new Vector3(
-                Mathf.Cos(angle * Mathf.Deg2Rad) * itemSpacing - 0.2f, 
+                Mathf.Cos(angle * Mathf.Deg2Rad) * itemSpacing - 0.2f,
                 itemHeightOffset,
                 Mathf.Sin(angle * Mathf.Deg2Rad) * itemSpacing
             );
 
-            storedItems[i].transform.localPosition = offset; 
-            storedItems[i].transform.localRotation = Quaternion.identity; 
+            storedItems[i].transform.localPosition = offset;
+            storedItems[i].transform.localRotation = Quaternion.identity;
         }
     }
 
@@ -110,4 +112,15 @@ public class Plate : MonoBehaviour
             Debug.Log("Agora o prato pode receber itens.");
         }
     }
+
+    public List<string> GetStoredItemNames()
+    {
+        List<string> itemNames = new List<string>();
+        foreach (GameObject item in storedItems)
+        {
+            itemNames.Add(item.name);
+        }
+        return itemNames;
+    }
+
 }
