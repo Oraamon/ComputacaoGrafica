@@ -77,22 +77,37 @@ public class PlayerInteraction : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
+{
+    if (other.CompareTag("Pickup") || other.CompareTag("Interactable"))
     {
-        if (other.CompareTag("Pickup") || other.CompareTag("Interactable"))
+        interactableObjects.Add(other.gameObject);
+        UpdateNearestObject();
+        
+        // Inicie o efeito de piscar
+        BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
+        if (blinkingEffect != null)
         {
-            interactableObjects.Add(other.gameObject);
-            UpdateNearestObject();
+            blinkingEffect.StartBlinking();
         }
     }
+}
 
-    private void OnTriggerExit(Collider other)
+private void OnTriggerExit(Collider other)
+{
+    if (interactableObjects.Contains(other.gameObject))
     {
-        if (interactableObjects.Contains(other.gameObject))
+        interactableObjects.Remove(other.gameObject);
+        UpdateNearestObject();
+        
+        // Pare o efeito de piscar
+        BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
+        if (blinkingEffect != null)
         {
-            interactableObjects.Remove(other.gameObject);
-            UpdateNearestObject();
+            blinkingEffect.StopBlinking();
         }
     }
+}
+
 
     private void UpdateNearestObject()
     {
