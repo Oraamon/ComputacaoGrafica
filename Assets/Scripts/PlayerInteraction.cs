@@ -27,7 +27,7 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E) && nearbyObject != null)
         {
-            if (heldItem == null) 
+            if (heldItem == null)
             {
                 if (nearbyObject.CompareTag("Pickup"))
                 {
@@ -40,7 +40,8 @@ public class PlayerInteraction : MonoBehaviour
                     {
                         PickupItem(itemFromContainer);
                     }
-                }else if (nearbyObject.TryGetComponent<FoodContainer>(out FoodContainer foodContainer))
+                }
+                else if (nearbyObject.TryGetComponent<FoodContainer>(out FoodContainer foodContainer))
                 {
                     GameObject itemFromContainer = foodContainer.SpawnItem();
                     if (itemFromContainer != null)
@@ -48,13 +49,13 @@ public class PlayerInteraction : MonoBehaviour
                         PickupItem(itemFromContainer);
                     }
                 }
-                
+
                 if (interactionText != null)
                 {
                     interactionText.gameObject.SetActive(false);
                 }
             }
-            else 
+            else
             {
                 if (nearbyObject.TryGetComponent<Container>(out Container container))
                 {
@@ -77,43 +78,82 @@ public class PlayerInteraction : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
-{
-    if (other.CompareTag("Pickup") || other.CompareTag("Interactable"))
     {
-        interactableObjects.Add(other.gameObject);
-        UpdateNearestObject();
-        
-        // Inicie o efeito de piscar
-        BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
-        if (blinkingEffect != null)
+        if (other.CompareTag("Interactable"))
         {
-            blinkingEffect.StartBlinking();
+            interactableObjects.Add(other.gameObject);
+            UpdateNearestObject();
+
+            // Stop blinking on the previously closest object
+            foreach (var obj in interactableObjects)
+            {
+                BlinkingEffect blinkingEffect = obj.GetComponent<BlinkingEffect>();
+                if (blinkingEffect != null)
+                {
+                    blinkingEffect.StopBlinking();
+                }
+            }
+
+            // Apply blinking effect only to the current nearest object
+            if (nearbyObject != null)
+            {
+
+                BlinkingEffect blinkingEffect = nearbyObject.GetComponent<BlinkingEffect>();
+                if (blinkingEffect != null)
+                {
+                    blinkingEffect.StartBlinking();
+                }
+            }
+        }
+        else if (other.CompareTag("Pickup"))
+        {
+            List<GameObject> idxObject = interactableObjects;
+
+            interactableObjects.Add(other.gameObject);
+            UpdateNearestObject();
         }
     }
-}
 
-private void OnTriggerExit(Collider other)
-{
-    if (interactableObjects.Contains(other.gameObject))
+
+
+    private void OnTriggerExit(Collider other)
     {
-        interactableObjects.Remove(other.gameObject);
-        UpdateNearestObject();
-        
-        // Pare o efeito de piscar
-        BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
-        if (blinkingEffect != null)
+        if (interactableObjects.Contains(other.gameObject))
         {
-            blinkingEffect.StopBlinking();
+            interactableObjects.Remove(other.gameObject);
+            UpdateNearestObject();
+
+            // Loga a lista no console
+            Debug.Log("Objetos interagíveis próximos (OnTriggerExit):");
+            foreach (var obj in interactableObjects)
+            {
+                Debug.Log(obj.name);
+            }
+
+            // Pare o efeito de piscar
+            BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
+            if (blinkingEffect != null)
+            {
+                blinkingEffect.StopBlinking();
+            }
         }
     }
-}
-
 
     private void UpdateNearestObject()
     {
         if (interactableObjects.Count > 0)
         {
             nearbyObject = interactableObjects[interactableObjects.Count - 1];
+            // Log the list of interactable objects in a readable format
+            Debug.Log("Objetos interagíveis próximos:");
+            foreach (var obj in interactableObjects)
+            {
+                if (obj != null)
+                {
+                    Debug.Log(obj.name);
+                }
+            }
+
             if (interactionText != null)
             {
                 interactionText.gameObject.SetActive(true);
@@ -137,6 +177,9 @@ private void OnTriggerExit(Collider other)
             item.transform.SetParent(handTransform);
             item.transform.localPosition = Vector3.zero;
             item.transform.localRotation = Quaternion.identity;
+
+            // Update nearest object after picking up the item
+            UpdateNearestObject();
         }
         else
         {
@@ -151,6 +194,10 @@ private void OnTriggerExit(Collider other)
             heldItem.transform.SetParent(null);
             heldItem.transform.position = position;
             heldItem = null;
+
+            // Update nearest object after dropping the item
+            UpdateNearestObject();
         }
     }
+
 }

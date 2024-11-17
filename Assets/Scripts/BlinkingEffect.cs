@@ -1,46 +1,58 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BlinkingEffect : MonoBehaviour
 {
     public float blinkInterval = 0.5f;
-    private Renderer objRenderer;
-    private Color originalColor;
+    private List<Renderer> objRenderers = new List<Renderer>();
+    private Dictionary<Renderer, Color> originalColors = new Dictionary<Renderer, Color>();
     private bool isBlinking = false;
 
     void Start()
     {
-        // Obtenha o Renderer apenas do objeto atual
-        objRenderer = GetComponent<Renderer>();
+        // Get all Renderer components in the current object and its children
+        objRenderers.AddRange(GetComponentsInChildren<Renderer>());
 
-        if (objRenderer == null)
+        if (objRenderers.Count == 0)
         {
-            Debug.LogError("Nenhum Renderer encontrado no objeto: " + gameObject.name);
+            Debug.LogError("No Renderers found on the object or its children: " + gameObject.name);
             return;
         }
 
-        // Armazena a cor original do material
-        originalColor = objRenderer.material.color;
+        // Store the original colors of all materials
+        foreach (var renderer in objRenderers)
+        {
+            originalColors[renderer] = renderer.material.color;
+        }
     }
 
     public void StartBlinking()
     {
-        if (objRenderer != null)
+        if (objRenderers.Count > 0)
         {
             isBlinking = true;
             StartCoroutine(Blink());
-            Debug.Log("Iniciando efeito de piscar no objeto: " + gameObject.name);
+            Debug.Log("Starting blink effect on object: " + gameObject.name);
         }
     }
 
     public void StopBlinking()
     {
-        if (objRenderer != null)
+        if (objRenderers.Count > 0)
         {
             isBlinking = false;
             StopCoroutine(Blink());
-            objRenderer.material.color = originalColor; // Restaura a cor original
-            Debug.Log("Parando efeito de piscar no objeto: " + gameObject.name);
+
+            // Restore original colors for each renderer
+            foreach (var renderer in objRenderers)
+            {
+                if (renderer != null)
+                {
+                    renderer.material.color = originalColors[renderer];
+                }
+            }
+            Debug.Log("Stopping blink effect on object: " + gameObject.name);
         }
     }
 
@@ -48,9 +60,18 @@ public class BlinkingEffect : MonoBehaviour
     {
         while (isBlinking)
         {
-            objRenderer.material.color = Color.clear; // Define a cor transparente
+            // Set all renderers to transparent
+            foreach (var renderer in objRenderers)
+            {
+                renderer.material.color = Color.clear;
+            }
             yield return new WaitForSeconds(blinkInterval);
-            objRenderer.material.color = originalColor; // Restaura a cor original
+
+            // Restore original colors
+            foreach (var renderer in objRenderers)
+            {
+                renderer.material.color = originalColors[renderer];
+            }
             yield return new WaitForSeconds(blinkInterval);
         }
     }
