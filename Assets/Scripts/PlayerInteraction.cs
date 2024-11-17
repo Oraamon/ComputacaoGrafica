@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Data.Common;
 
 public class PlayerInteraction : MonoBehaviour
 {
@@ -107,9 +108,8 @@ public class PlayerInteraction : MonoBehaviour
         }
         else if (other.CompareTag("Pickup"))
         {
-            List<GameObject> idxObject = interactableObjects;
-
             interactableObjects.Add(other.gameObject);
+
             UpdateNearestObject();
         }
     }
@@ -136,6 +136,16 @@ public class PlayerInteraction : MonoBehaviour
             {
                 blinkingEffect.StopBlinking();
             }
+
+            if (nearbyObject != null)
+            {
+                Debug.Log(nearbyObject + "aaaaaaa");
+                BlinkingEffect blinkingEffectAdx = nearbyObject.GetComponent<BlinkingEffect>();
+                if (blinkingEffectAdx != null)
+                {
+                    blinkingEffectAdx.StartBlinking();
+                }
+            }
         }
     }
 
@@ -154,18 +164,10 @@ public class PlayerInteraction : MonoBehaviour
                 }
             }
 
-            if (interactionText != null)
-            {
-                interactionText.gameObject.SetActive(true);
-            }
         }
         else
         {
             nearbyObject = null;
-            if (interactionText != null)
-            {
-                interactionText.gameObject.SetActive(false);
-            }
         }
     }
 
