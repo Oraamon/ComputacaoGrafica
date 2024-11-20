@@ -50,7 +50,24 @@ public class PlayerInteraction : MonoBehaviour
                         PickupItem(itemFromContainer);
                     }
                 }
+                else if (nearbyObject.TryGetComponent<DeliverySpot>(out DeliverySpot delivery))
+                {
+                    Plate plateFromDelivery = delivery.RemoveItem();
 
+                    if (plateFromDelivery != null)
+                    {
+                        PickupItem(plateFromDelivery.gameObject);
+
+                        if (interactionText != null)
+                        {
+                            interactionText.gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Não há pratos disponíveis no DeliverySpot para pegar.");
+                    }
+                }
                 if (interactionText != null)
                 {
                     interactionText.gameObject.SetActive(false);
@@ -68,6 +85,23 @@ public class PlayerInteraction : MonoBehaviour
                         {
                             interactionText.gameObject.SetActive(false);
                         }
+                    }
+                }
+                else if (nearbyObject.TryGetComponent<DeliverySpot>(out DeliverySpot delivery))
+                {
+                    if (heldItem.TryGetComponent<Plate>(out Plate plate) && delivery.CanPlacePlate(plate))
+                    {
+                        delivery.PlacePlate(plate);
+                        heldItem = null;
+
+                        if (interactionText != null)
+                        {
+                            interactionText.gameObject.SetActive(false); 
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("O objeto na mão não é um prato ou o delivery não pode aceitar o prato.");
                     }
                 }
                 else
@@ -118,43 +152,42 @@ public class PlayerInteraction : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        // Certifique-se de que o objeto ainda existe antes de acessá-lo
+        if (other == null || other.gameObject == null)
+        {
+            return;
+        }
+
         if (interactableObjects.Contains(other.gameObject))
         {
             interactableObjects.Remove(other.gameObject);
             UpdateNearestObject();
 
-            // Loga a lista no console
-            Debug.Log("Objetos interagíveis próximos (OnTriggerExit):");
-            foreach (var obj in interactableObjects)
-            {
-                Debug.Log(obj.name);
-            }
-
-            // Pare o efeito de piscar
-            BlinkingEffect blinkingEffect = other.GetComponent<BlinkingEffect>();
-            if (blinkingEffect != null)
+            // Para o efeito de piscar
+            if (other.TryGetComponent<BlinkingEffect>(out BlinkingEffect blinkingEffect))
             {
                 blinkingEffect.StopBlinking();
             }
 
-            if (nearbyObject != null)
+            // Verifica se o nearbyObject ainda é válido
+            if (nearbyObject != null && nearbyObject.TryGetComponent<BlinkingEffect>(out BlinkingEffect blinkingEffectAdx))
             {
-                Debug.Log(nearbyObject + "aaaaaaa");
-                BlinkingEffect blinkingEffectAdx = nearbyObject.GetComponent<BlinkingEffect>();
-                if (blinkingEffectAdx != null)
-                {
-                    blinkingEffectAdx.StartBlinking();
-                }
+                blinkingEffectAdx.StartBlinking();
             }
         }
     }
 
+
     private void UpdateNearestObject()
     {
+        // Remove objetos destruídos da lista
+        interactableObjects.RemoveAll(obj => obj == null);
+
         if (interactableObjects.Count > 0)
         {
             nearbyObject = interactableObjects[interactableObjects.Count - 1];
-            // Log the list of interactable objects in a readable format
+            
+            // Loga os objetos válidos na lista
             Debug.Log("Objetos interagíveis próximos:");
             foreach (var obj in interactableObjects)
             {
@@ -163,7 +196,6 @@ public class PlayerInteraction : MonoBehaviour
                     Debug.Log(obj.name);
                 }
             }
-
         }
         else
         {
