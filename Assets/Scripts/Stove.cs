@@ -30,7 +30,7 @@ public class Stove : MonoBehaviour
     {
         if (progressBarUI != null)
         {
-            progressBarUI.SetProgress(progress);
+
         }
     }
 
@@ -82,7 +82,7 @@ public class Stove : MonoBehaviour
 
         if (progressBarUI != null)
         {
-            progressBarUI.Show(); // Exibe a barra de progresso
+
         }
 
         isCooking = true; // Inicia o cozimento
@@ -96,7 +96,7 @@ public class Stove : MonoBehaviour
 
         if (progressBarUI != null)
         {
-            progressBarUI.Hide(); // Oculta a barra de progresso
+
         }
 
         // Remove o item cru
@@ -120,7 +120,7 @@ public class Stove : MonoBehaviour
             isCooking = false;
             if (progressBarUI != null)
             {
-                progressBarUI.Hide(); // Oculta a barra de progresso
+
             }
 
             return item;

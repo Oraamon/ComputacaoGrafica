@@ -1,37 +1,76 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
-public class ProgressBarUI : MonoBehaviour
+public class ProgressBarUI : MonoBehaviour 
 {
-    [SerializeField] private ProgressTracker progressTracker;
-    [SerializeField] private Image progressFillBar;
+    [SerializeField] private MesaCorte cuttingCounter;
+    [SerializeField] private Image barImage;
     [SerializeField] private GameObject progressBarUIObject;
 
-    private void Start()
+    private void Start() 
     {
-        if (progressTracker != null)
+        if (cuttingCounter != null)
         {
-            progressTracker.OnProgressChanged += SetProgress;
-            SetProgress(progressTracker.Progress);
+            cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+            cuttingCounter.OnCutComplete += CuttingCounter_OnCutComplete;
+            cuttingCounter.OnCutPaused += CuttingCounter_OnCutPaused;
+            cuttingCounter.OnCutCancelled += CuttingCounter_OnCutCancelled;
         }
         else
         {
-            Debug.LogWarning("ProgressTracker is null, progress will not be tracked.");
+            Debug.LogError("CuttingCounter não está atribuído no Inspector.");
+        }
+        Hide();
+        if (barImage != null)
+        {
+            barImage.fillAmount = 0f;
         }
     }
 
-    public void SetProgress(double progress)
+    private void CuttingCounter_OnProgressChanged(object sender, CuttingProgressChangedEventArgs e) 
+    { 
+        if (barImage != null)
+        {
+            barImage.fillAmount = e.ProgressNormalized; 
+            Show();
+        }
+        Debug.LogWarning("PROGRESS: " + barImage.fillAmount);
+    }
+
+    private void CuttingCounter_OnCutComplete(object sender, EventArgs e)
     {
-        progressFillBar.fillAmount = (float)progress;
+        Hide();
+    }
+
+    private void CuttingCounter_OnCutPaused(object sender, EventArgs e)
+    {
+        Hide();
+    }
+
+    private void CuttingCounter_OnCutCancelled(object sender, EventArgs e)
+    {
+        Hide();
     }
 
     public void Show()
     {
-        progressBarUIObject.SetActive(true);
+        if (progressBarUIObject != null)
+        {
+            progressBarUIObject.SetActive(true);
+        }
     }
 
     public void Hide()
     {
-        progressBarUIObject.SetActive(false);
+        if (progressBarUIObject != null)
+        {
+            progressBarUIObject.SetActive(false);
+        }
+
+        if (barImage != null)
+        {
+            barImage.fillAmount = 0f; 
+        }
     }
 }
