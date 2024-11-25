@@ -13,13 +13,12 @@ public class MesaCorte : MonoBehaviour
     [SerializeField] private List<CutPrefabMapping> cutPrefabMappings; // Mapeamento de objetos cortados
 
     private Dictionary<string, GameObject> cutPrefabDictionary; // Dicionário para mapeamento rápido
-    private Dictionary<string, float> itemCuttingProgress; // Dicionário para salvar progresso de corte
+    private Dictionary<int, float> itemCuttingProgress; // Dicionário para salvar progresso de corte baseado em ID único
 
     private GameObject currentObject; // Objeto atual na mesa
     private float cuttingProgress = 0f; // Progresso do corte
     private bool isCutting = false; // Indica se o corte está ativo
 
-    // Eventos agora usam OnProgressChangedEventArgs
     public event EventHandler<CuttingProgressChangedEventArgs> OnProgressChanged;
     public event EventHandler OnCutComplete; // Evento ao completar o corte
     public event EventHandler OnCutPaused; // Evento ao pausar o corte
@@ -37,7 +36,6 @@ public class MesaCorte : MonoBehaviour
             Debug.LogError("CutPrefabMappings não estão configuradas no Inspector.");
         }
 
-        // Inicializar o dicionário para mapeamento rápido
         cutPrefabDictionary = new Dictionary<string, GameObject>();
         foreach (CutPrefabMapping mapping in cutPrefabMappings)
         {
@@ -52,8 +50,7 @@ public class MesaCorte : MonoBehaviour
             }
         }
 
-        // Inicializar o dicionário para progresso de corte
-        itemCuttingProgress = new Dictionary<string, float>();
+        itemCuttingProgress = new Dictionary<int, float>();
     }
 
     private void Update() 
@@ -62,18 +59,9 @@ public class MesaCorte : MonoBehaviour
 
         cuttingProgress += Time.deltaTime;
 
-        // Atualizar o progresso no dicionário
-        string key = currentObject.name.ToLower();
-        if (itemCuttingProgress.ContainsKey(key))
-        {
-            itemCuttingProgress[key] = cuttingProgress / cuttingTime;
-        }
-        else
-        {
-            itemCuttingProgress.Add(key, cuttingProgress / cuttingTime);
-        }
+        int key = currentObject.GetInstanceID();
+        itemCuttingProgress[key] = cuttingProgress / cuttingTime;
 
-        // Dispara evento com OnProgressChangedEventArgs
         OnProgressChanged?.Invoke(this, new CuttingProgressChangedEventArgs(cuttingProgress / cuttingTime));
 
         if (cuttingProgress >= cuttingTime) 
@@ -87,24 +75,19 @@ public class MesaCorte : MonoBehaviour
         if (currentObject != null) 
         {
             Debug.Log($"Objeto {currentObject.name} cortado!");
-            Destroy(currentObject); // Remove o objeto original
+            Destroy(currentObject);
 
-            // Encontrar o prefab cortado correspondente
             GameObject cutPrefab = GetCutPrefab(currentObject.name);
 
             if (cutPrefab != null)
             {
-                // Instanciar o prefab cortado na posição e rotação especificadas
                 GameObject cutObject = Instantiate(cutPrefab, itemPlace.position, itemPlace.rotation, transform);
-                cutObject.tag = "Pickup"; // Define a tag para o objeto cortado, se necessário
+                cutObject.tag = "Pickup";
 
                 Debug.Log($"Objeto cortado instanciado: {cutObject.name}");
-
-                // Atualizar a referência para o objeto cortado
                 currentObject = cutObject;
 
-                // Remover o progresso salvo, já que o corte foi concluído
-                string key = cutObject.name.ToLower();
+                int key = currentObject.GetInstanceID();
                 if (itemCuttingProgress.ContainsKey(key))
                 {
                     itemCuttingProgress.Remove(key);
@@ -128,15 +111,14 @@ public class MesaCorte : MonoBehaviour
         if (currentObject != null) 
         {
             Debug.LogWarning("A mesa de corte já está ocupada.");
-            return false; // A mesa já está ocupada
+            return false;
         }
         if (!IsObjectCuttable(playerObject)) 
         {
             Debug.LogWarning($"O objeto {playerObject.name} não é cortável.");
-            return false; // O item não é cortável
+            return false;
         }
 
-        // Verificar se o item já foi cortado
         if (IsAlreadyCut(playerObject))
         {
             Debug.LogWarning($"O objeto {playerObject.name} já foi cortado e não pode ser cortado novamente.");
@@ -146,24 +128,18 @@ public class MesaCorte : MonoBehaviour
         currentObject = playerObject;
         currentObject.transform.position = itemPlace.position;
         currentObject.transform.rotation = itemPlace.rotation;
-        currentObject.transform.parent = itemPlace; // Define o parent para itemPlace
+        currentObject.transform.parent = itemPlace;
 
-        // Ativar o objeto se estava desativado
         currentObject.SetActive(true);
 
         Debug.Log($"Objeto {currentObject.name} colocado na mesa de corte.");
 
-        // Inicializar o progresso de corte para este item, se ainda não existir
-        string key = currentObject.name.ToLower();
+        int key = currentObject.GetInstanceID();
         if (!itemCuttingProgress.ContainsKey(key))
         {
-            itemCuttingProgress.Add(key, 0f);
+            itemCuttingProgress[key] = 0f;
         }
-        else
-        {
-            cuttingProgress = itemCuttingProgress[key] * cuttingTime;
-            Debug.Log($"Progresso de corte para {currentObject.name} restaurado: {itemCuttingProgress[key] * 100}%");
-        }
+        cuttingProgress = itemCuttingProgress[key] * cuttingTime;
 
         return true;
     }
@@ -193,7 +169,6 @@ public class MesaCorte : MonoBehaviour
             return;
         }
 
-        // Verificar se o objeto já foi cortado
         if (IsAlreadyCut(currentObject))
         {
             Debug.LogWarning($"O objeto {currentObject.name} já foi cortado e não pode ser cortado novamente.");
@@ -229,19 +204,8 @@ public class MesaCorte : MonoBehaviour
             Debug.Log("Corte cancelado.");
             OnCutCancelled?.Invoke(this, EventArgs.Empty);
 
-            // Salvar o progresso atual no dicionário
-            string key = currentObject.name.ToLower();
-            if (itemCuttingProgress.ContainsKey(key))
-            {
-                itemCuttingProgress[key] = cuttingProgress / cuttingTime;
-            }
-            else
-            {
-                itemCuttingProgress.Add(key, cuttingProgress / cuttingTime);
-            }
-
-            // Resetar o progresso de corte
-            cuttingProgress = 0f;
+            int key = currentObject.GetInstanceID();
+            itemCuttingProgress[key] = cuttingProgress / cuttingTime;
         }
     }
 
@@ -259,12 +223,9 @@ public class MesaCorte : MonoBehaviour
 
     private bool IsAlreadyCut(GameObject obj)
     {
-        // Verifica se o objeto já foi cortado com base no nome
-        // Aqui, assumimos que objetos cortados possuem "_cut" no nome
         return obj.name.ToLower().Contains("_cut");
     }
 
-    // Método para obter o prefab cortado correspondente
     private GameObject GetCutPrefab(string originalName)
     {
         foreach (CutPrefabMapping mapping in cutPrefabMappings)
@@ -274,8 +235,6 @@ public class MesaCorte : MonoBehaviour
                 return mapping.cutPrefab;
             }
         }
-        return null; // Retorna null se não encontrar
+        return null;
     }
 }
-
-

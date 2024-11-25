@@ -299,6 +299,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blinkInterval: 0.5
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineThickness: 0.03
 --- !u!1 &12981058
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +478,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blinkInterval: 0.5
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineThickness: 0.03
 --- !u!1 &33709275
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,36 +532,40 @@ PrefabInstance:
       value: 0.6666667
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6666666
+      objectReference: {fileID: 0}
+    - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.401
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.09
+      value: -0.54
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.81
+      value: 1.724
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.5
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 90
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 4589716710238282923, guid: 9a9137fa2b035d34e881701d2c178192, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -712,7 +720,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812876574508226176, guid: fb403d1efda6baf4190c507841617408, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.24
       objectReference: {fileID: 0}
     - target: {fileID: 3812876574508226176, guid: fb403d1efda6baf4190c507841617408, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1670,6 +1678,7 @@ GameObject:
   - component: {fileID: 334918200}
   - component: {fileID: 334918208}
   - component: {fileID: 334918207}
+  - component: {fileID: 334918209}
   m_Layer: 0
   m_Name: Caixa Prato
   m_TagString: Interactable
@@ -1817,6 +1826,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.0000002, y: 1.15, z: 1.0000002}
   m_Center: {x: 0.1, y: 0.05, z: 0.43}
+--- !u!114 &334918209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334918199}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2432ae0cc0718e4e93013a97b590b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blinkInterval: 0.5
+  outlineColor: {r: 1, g: 0.5067103, b: 0, a: 1}
+  outlineThickness: 0.03
 --- !u!1 &353164364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,8 +1894,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8098223, y: 1, z: 0.96000004}
-  m_Center: {x: 0.07491124, y: 0, z: 1.8699999}
+  m_Size: {x: 0.96629953, y: 0.9529129, z: 0.9809268}
+  m_Center: {x: 0.12707037, y: -0.062782705, z: 1.7287383}
 --- !u!54 &353164367
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1918,8 +1942,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4065319, y: 1, z: 0.717009}
-  m_Center: {x: 0.7032663, y: 0, z: 1.87}
+  m_Size: {x: 1.4065319, y: 0.83519554, z: 0.47569385}
+  m_Center: {x: 0.5728686, y: -0.019619346, z: 1.7149748}
 --- !u!23 &353164369
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2121,7 +2145,7 @@ Transform:
   m_GameObject: {fileID: 356321133}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.66, y: 1.0799999, z: 3.321}
+  m_LocalPosition: {x: 3.66, y: 1.0799999, z: -17.88}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2415,7 +2439,7 @@ Transform:
   m_GameObject: {fileID: 545163905}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.211, y: 1.0799999, z: 3.321}
+  m_LocalPosition: {x: 2.211, y: 1.0799999, z: -20.14}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -3194,10 +3218,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cuttingTime: 4
   cuttableNames:
-  - Tomate
+  - Tomate(Clone)
   itemPlace: {fileID: 878237026}
   cutPrefabMappings:
-  - originalName: Tomate
+  - originalName: Tomate(Clone)
     cutPrefab: {fileID: 1514767983}
 --- !u!1001 &799556100
 PrefabInstance:
@@ -3610,7 +3634,7 @@ Transform:
   m_GameObject: {fileID: 878007711}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.92, y: 1.0799999, z: 3.321}
+  m_LocalPosition: {x: 4.92, y: 1.0799999, z: -21.5}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -4588,7 +4612,7 @@ Transform:
   m_GameObject: {fileID: 1484036970}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.675, y: 1.0799999, z: 3.321}
+  m_LocalPosition: {x: 5.675, y: 1.0799999, z: -23.2}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -4904,7 +4928,7 @@ Transform:
   m_GameObject: {fileID: 1514767983}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.986, y: 1.0799999, z: 3.321}
+  m_LocalPosition: {x: 0.986, y: 1.0799999, z: -17.59}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -5383,6 +5407,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blinkInterval: 0.5
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineThickness: 0.03
 --- !u!1 &1731388259
 GameObject:
   m_ObjectHideFlags: 0
@@ -6266,6 +6292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blinkInterval: 0.5
+  outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  outlineThickness: 0.03
 --- !u!1 &2102142917
 GameObject:
   m_ObjectHideFlags: 0
