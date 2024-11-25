@@ -2,24 +2,31 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-public class ProgressBarUI : MonoBehaviour 
+public class ProgressBarUI : MonoBehaviour
 {
-    [SerializeField] private MesaCorte cuttingCounter;
+    [SerializeField] private MonoBehaviour progressibleObject;
     [SerializeField] private Image barImage;
     [SerializeField] private GameObject progressBarUIObject;
 
-    private void Start() 
+    private IProgressible progressible;
+
+    private void Start()
     {
-        if (cuttingCounter != null)
+        if (progressibleObject is IProgressible progressible)
         {
-            cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
-            cuttingCounter.OnCutComplete += CuttingCounter_OnCutComplete;
-            cuttingCounter.OnCutPaused += CuttingCounter_OnCutPaused;
-            cuttingCounter.OnCutCancelled += CuttingCounter_OnCutCancelled;
+            this.progressible = progressible;
+            this.progressible.OnProgressChanged += Progressible_OnProgressChanged;
+            this.progressible.OnProgressComplete += Progressible_OnProgressComplete;
+
+            if (progressibleObject is MesaCorte mesaCorte)
+            {
+                mesaCorte.OnCutPaused += CuttingCounter_OnCutPaused;
+                mesaCorte.OnCutCancelled += CuttingCounter_OnCutCancelled;
+            }
         }
         else
         {
-            Debug.LogError("CuttingCounter não está atribuído no Inspector.");
+            Debug.LogError("O objeto atribuído não implementa IProgressible.");
         }
         Hide();
         if (barImage != null)
@@ -28,17 +35,31 @@ public class ProgressBarUI : MonoBehaviour
         }
     }
 
-    private void CuttingCounter_OnProgressChanged(object sender, CuttingProgressChangedEventArgs e) 
-    { 
-        if (barImage != null)
+    private void OnDestroy()
+    {
+        if (progressible != null)
         {
-            barImage.fillAmount = e.ProgressNormalized; 
-            Show();
+            progressible.OnProgressChanged -= Progressible_OnProgressChanged;
+            progressible.OnProgressComplete -= Progressible_OnProgressComplete;
+
+            if (progressibleObject is MesaCorte mesaCorte)
+            {
+                mesaCorte.OnCutPaused -= CuttingCounter_OnCutPaused;
+                mesaCorte.OnCutCancelled -= CuttingCounter_OnCutCancelled;
+            }
         }
-        Debug.LogWarning("PROGRESS: " + barImage.fillAmount);
     }
 
-    private void CuttingCounter_OnCutComplete(object sender, EventArgs e)
+    private void Progressible_OnProgressChanged(object sender, ProgressChangedEventArgs e)
+    {
+        if (barImage != null)
+        {
+            barImage.fillAmount = e.ProgressNormalized;
+            Show();
+        }
+    }
+
+    private void Progressible_OnProgressComplete(object sender, EventArgs e)
     {
         Hide();
     }
@@ -70,7 +91,7 @@ public class ProgressBarUI : MonoBehaviour
 
         if (barImage != null)
         {
-            barImage.fillAmount = 0f; 
+            barImage.fillAmount = 0f;
         }
     }
 }

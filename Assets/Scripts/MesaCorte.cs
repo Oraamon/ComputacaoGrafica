@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MesaCorte : MonoBehaviour 
+// Implementa a interface IProgressible para compatibilidade com ProgressBarUI
+public class MesaCorte : MonoBehaviour, IProgressible
 {
     [SerializeField] private float cuttingTime = 2f; // Tempo necessário para cortar o item
     [SerializeField] private List<string> cuttableNames; // Lista de nomes dos objetos cortáveis
@@ -19,8 +20,11 @@ public class MesaCorte : MonoBehaviour
     private float cuttingProgress = 0f; // Progresso do corte
     private bool isCutting = false; // Indica se o corte está ativo
 
-    public event EventHandler<CuttingProgressChangedEventArgs> OnProgressChanged;
-    public event EventHandler OnCutComplete; // Evento ao completar o corte
+    // Eventos da interface IProgressible
+    public event EventHandler<ProgressChangedEventArgs> OnProgressChanged;
+    public event EventHandler OnProgressComplete;
+
+    // Eventos adicionais mantidos conforme a lógica original
     public event EventHandler OnCutPaused; // Evento ao pausar o corte
     public event EventHandler OnCutCancelled; // Evento ao cancelar o corte
 
@@ -53,7 +57,7 @@ public class MesaCorte : MonoBehaviour
         itemCuttingProgress = new Dictionary<int, float>();
     }
 
-    private void Update() 
+    private void Update()
     {
         if (currentObject == null || !isCutting) return;
 
@@ -62,17 +66,18 @@ public class MesaCorte : MonoBehaviour
         int key = currentObject.GetInstanceID();
         itemCuttingProgress[key] = cuttingProgress / cuttingTime;
 
-        OnProgressChanged?.Invoke(this, new CuttingProgressChangedEventArgs(cuttingProgress / cuttingTime));
+        // Dispara o evento OnProgressChanged da interface IProgressible
+        OnProgressChanged?.Invoke(this, new ProgressChangedEventArgs(cuttingProgress / cuttingTime));
 
-        if (cuttingProgress >= cuttingTime) 
+        if (cuttingProgress >= cuttingTime)
         {
             CompleteCut();
         }
     }
 
-    private void CompleteCut() 
+    private void CompleteCut()
     {
-        if (currentObject != null) 
+        if (currentObject != null)
         {
             Debug.Log($"Objeto {currentObject.name} cortado!");
             Destroy(currentObject);
@@ -92,6 +97,9 @@ public class MesaCorte : MonoBehaviour
                 {
                     itemCuttingProgress.Remove(key);
                 }
+
+                // Dispara o evento OnProgressComplete da interface IProgressible
+                OnProgressComplete?.Invoke(this, EventArgs.Empty);
             }
             else
             {
@@ -101,19 +109,17 @@ public class MesaCorte : MonoBehaviour
 
             isCutting = false;
             cuttingProgress = 0f;
-
-            OnCutComplete?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    public bool TryPlaceObject(GameObject playerObject) 
+    public bool TryPlaceObject(GameObject playerObject)
     {
-        if (currentObject != null) 
+        if (currentObject != null)
         {
             Debug.LogWarning("A mesa de corte já está ocupada.");
             return false;
         }
-        if (!IsObjectCuttable(playerObject)) 
+        if (!IsObjectCuttable(playerObject))
         {
             Debug.LogWarning($"O objeto {playerObject.name} não é cortável.");
             return false;
@@ -141,10 +147,12 @@ public class MesaCorte : MonoBehaviour
         }
         cuttingProgress = itemCuttingProgress[key] * cuttingTime;
 
+        OnProgressChanged?.Invoke(this, new ProgressChangedEventArgs(cuttingProgress / cuttingTime));
+
         return true;
     }
 
-    public GameObject TakeObject() 
+    public GameObject TakeObject()
     {
         if (currentObject == null) return null;
 
@@ -161,7 +169,7 @@ public class MesaCorte : MonoBehaviour
         return objectToTake;
     }
 
-    public void StartCutting() 
+    public void StartCutting()
     {
         if (currentObject == null)
         {
@@ -204,12 +212,24 @@ public class MesaCorte : MonoBehaviour
             Debug.Log("Corte cancelado.");
             OnCutCancelled?.Invoke(this, EventArgs.Empty);
 
-            int key = currentObject.GetInstanceID();
-            itemCuttingProgress[key] = cuttingProgress / cuttingTime;
+            if (currentObject != null)
+            {
+                int key = currentObject.GetInstanceID();
+                itemCuttingProgress[key] = cuttingProgress / cuttingTime;
+
+                // Atualiza o progresso no UI após cancelamento
+                OnProgressChanged?.Invoke(this, new ProgressChangedEventArgs(cuttingProgress / cuttingTime));
+            }
         }
     }
 
-    private bool IsObjectCuttable(GameObject obj) 
+    // Implementação do método da interface IProgressible
+    public float GetProgressNormalized()
+    {
+        return cuttingProgress / cuttingTime;
+    }
+
+    private bool IsObjectCuttable(GameObject obj)
     {
         foreach (string name in cuttableNames)
         {

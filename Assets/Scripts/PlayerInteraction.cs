@@ -31,6 +31,13 @@ public class PlayerInteraction : MonoBehaviour
         if (cuttingProgressSlider != null)
         {
             cuttingProgressSlider.gameObject.SetActive(false);
+            cuttingProgressSlider.minValue = 0f;
+            cuttingProgressSlider.maxValue = 1f;
+            cuttingProgressSlider.value = 0f;
+        }
+        else
+        {
+            Debug.LogWarning("cuttingProgressSlider não está atribuído.");
         }
     }
 
@@ -100,7 +107,19 @@ public class PlayerInteraction : MonoBehaviour
                         Debug.LogWarning("Não há itens na mesa de corte para retirar.");
                     }
                 }
-
+                else if(nearbyObject.TryGetComponent<Stove>(out Stove stove)){
+                    GameObject itemFromProgressible = null;
+                    itemFromProgressible = stove.TakeObject();
+                    if (itemFromProgressible != null)
+                    {
+                        PickupItem(itemFromProgressible);
+                         Debug.Log("Item retirado do fogão.");
+                    }
+                    else
+                    {
+                            Debug.LogWarning("Não há itens no fogão para retirar.");
+                    }
+                }
                 if (interactionText != null)
                 {
                     interactionText.gameObject.SetActive(false);
@@ -150,6 +169,18 @@ public class PlayerInteraction : MonoBehaviour
                     else
                     {
                         Debug.LogWarning("Não é possível colocar o item na mesa de corte.");
+                    }
+                }
+                else if(nearbyObject.TryGetComponent<Stove>(out Stove stove)){
+                    bool placed = false;
+                    placed = stove.TryPlaceObject(heldItem);
+                    if (placed)
+                    {
+
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Não é possível colocar o item no fogão.");
                     }
                 }
                 else
@@ -210,14 +241,16 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (currentMesaCorte != null)
         {
+            // Atualização: Substituir OnCutComplete por OnProgressComplete
             currentMesaCorte.OnProgressChanged += HandleCuttingProgressChanged;
-            currentMesaCorte.OnCutComplete += HandleCutComplete;
+            currentMesaCorte.OnProgressComplete += HandleCutComplete; // Alterado para OnProgressComplete
             currentMesaCorte.OnCutPaused += HandleCutPaused;
             currentMesaCorte.OnCutCancelled += HandleCutCancelled;
+
             if (cuttingProgressSlider != null)
             {
                 cuttingProgressSlider.gameObject.SetActive(true);
-                cuttingProgressSlider.value = 0f;
+                cuttingProgressSlider.value = currentMesaCorte.GetProgressNormalized();
             }
         }
     }
@@ -227,10 +260,11 @@ public class PlayerInteraction : MonoBehaviour
         if (currentMesaCorte != null)
         {
             currentMesaCorte.OnProgressChanged -= HandleCuttingProgressChanged;
-            currentMesaCorte.OnCutComplete -= HandleCutComplete;
+            currentMesaCorte.OnProgressComplete -= HandleCutComplete; // Alterado para OnProgressComplete
             currentMesaCorte.OnCutPaused -= HandleCutPaused;
             currentMesaCorte.OnCutCancelled -= HandleCutCancelled;
             currentMesaCorte = null;
+
             if (cuttingProgressSlider != null)
             {
                 cuttingProgressSlider.gameObject.SetActive(false);
@@ -238,7 +272,8 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    private void HandleCuttingProgressChanged(object sender, CuttingProgressChangedEventArgs e)
+    // Atualização: Alterar o tipo de argumento para ProgressChangedEventArgs
+    private void HandleCuttingProgressChanged(object sender, ProgressChangedEventArgs e)
     {
         if (cuttingProgressSlider != null)
         {
@@ -351,12 +386,11 @@ public class PlayerInteraction : MonoBehaviour
             item.transform.localPosition = Vector3.zero;
             item.transform.localRotation = Quaternion.identity;
 
-
             UpdateNearestObject();
         }
         else
         {
-            Debug.LogWarning("Tentativa de pegar um item inválido.");
+            Debug.LogWarning("Tentativa de pegar um item inválido ou handTransform não está atribuído.");
         }
     }
 
