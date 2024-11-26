@@ -176,7 +176,7 @@ public class PlayerInteraction : MonoBehaviour
                     placed = stove.TryPlaceObject(heldItem);
                     if (placed)
                     {
-
+                        heldItem = null;
                     }
                     else
                     {

@@ -277,9 +277,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 11328771}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -1.691, y: 1.63, z: -4.94}
-  m_LocalScale: {x: 1.5, y: 1, z: 1.5}
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -1.6910005, y: 1.63, z: -4.94}
+  m_LocalScale: {x: 1.5000005, y: 1, z: 1.5000005}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1258014095}
@@ -2213,17 +2213,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be1e77e8d4e81bf4292e5b46dc090583, type: 3}
---- !u!114 &483461316 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4509271422839121732, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
-  m_PrefabInstance: {fileID: 1218786092}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4949a35e7ab04ec43adb2815973105af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &497740342
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2551,6 +2540,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &575067099 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8276876135305929108, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
+  m_PrefabInstance: {fileID: 1218786092}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &608885572
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4249,7 +4249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4949a35e7ab04ec43adb2815973105af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cuttingCounter: {fileID: 761018401}
+  progressibleObject: {fileID: 761018401}
   barImage: {fileID: 214480285}
   progressBarUIObject: {fileID: 1153290406}
 --- !u!1 &1185704108
@@ -4365,6 +4365,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1508065003}
     m_Modifications:
+    - target: {fileID: 4509271422839121732, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
+      propertyPath: barImage
+      value: 
+      objectReference: {fileID: 575067099}
+    - target: {fileID: 4509271422839121732, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
+      propertyPath: progressibleObject
+      value: 
+      objectReference: {fileID: 1508064997}
+    - target: {fileID: 4509271422839121732, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
+      propertyPath: progressBarUIObject
+      value: 
+      objectReference: {fileID: 1419527769}
     - target: {fileID: 4589716710238282922, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
       propertyPath: m_Name
       value: StoveCounter_Visual
@@ -4468,6 +4480,11 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 3812876574508226176, guid: fb403d1efda6baf4190c507841617408, type: 3}
   m_PrefabInstance: {fileID: 102566131}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1419527769 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7879989533320115757, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
+  m_PrefabInstance: {fileID: 1218786092}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1484036970
 GameObject:
@@ -4652,12 +4669,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e61936e881f24844d990e61cb2cf40e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  storedItem: {fileID: 0}
-  displayPosition: {fileID: 1659162606}
-  cookedItemPrefab: {fileID: 0}
-  progressTracker: {fileID: 0}
-  progressBarUI: {fileID: 483461316}
   cookingTime: 5
+  cookPrefabMappings:
+  - originalName: Carne(Clone)
+    cookedPrefab: {fileID: 1484036970}
+  displayPosition: {fileID: 1659162606}
 --- !u!65 &1508064998
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6517,8 +6533,8 @@ SceneRoots:
   - {fileID: 1721107956}
   - {fileID: 12981065}
   - {fileID: 2070971969}
-  - {fileID: 11328778}
   - {fileID: 1508065003}
+  - {fileID: 11328778}
   - {fileID: 191956952}
   - {fileID: 142603466}
   - {fileID: 353164371}
