@@ -3211,7 +3211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cf8c1803bbd78148aff755e8fb8a07d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemSpacing: 0.2
+  itemDisplayPosition: {fileID: 612143739}
+  itemSpacing: 0
   itemHeightOffset: 0.1
   maxItems: 5
   carneFritaPrefab: {fileID: 3812876574508226177, guid: e879ff1414d1dd64c9ad7b04bffdfaef, type: 3}

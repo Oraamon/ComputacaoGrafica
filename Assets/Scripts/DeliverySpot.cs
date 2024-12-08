@@ -18,6 +18,12 @@ public class DeliverySpot : MonoBehaviour
     {
         waitingRecipeSOList = new List<RecipeSO>();
         spawnRecipeTimer = spawnRecipeTimerMax;
+
+        // Inicialize expectedRecipes se não estiver inicializada no Inspector
+        if (expectedRecipes == null)
+        {
+            expectedRecipes = new List<RecipeSO>();
+        }
     }
 
     private void Update()
@@ -29,6 +35,12 @@ public class DeliverySpot : MonoBehaviour
 
             if (waitingRecipeSOList.Count < waitingRecipesMax)
             {
+                if (recipeListSO == null || recipeListSO.recipeSOList == null || recipeListSO.recipeSOList.Count == 0)
+                {
+                    Debug.LogError("recipeListSO ou recipeListSO.recipeSOList não está atribuído corretamente.");
+                    return;
+                }
+
                 RecipeSO newRecipeSO = recipeListSO.recipeSOList[Random.Range(0, recipeListSO.recipeSOList.Count)];
                 Debug.Log($"Nova receita adicionada: {newRecipeSO.recipeName}");
                 waitingRecipeSOList.Add(newRecipeSO);
@@ -51,9 +63,10 @@ public class DeliverySpot : MonoBehaviour
             plate.transform.position = platePosition.position;
             plate.transform.rotation = platePosition.rotation;
 
-            if (CheckDelivery())
+            RecipeSO deliveredRecipe = CheckDelivery();
+            if (deliveredRecipe != null)
             {
-                CompleteDelivery();
+                CompleteDelivery(deliveredRecipe);
             }
             else
             {
@@ -83,29 +96,57 @@ public class DeliverySpot : MonoBehaviour
         return null;
     }
 
-    private bool CheckDelivery()
+    private RecipeSO CheckDelivery()
     {
         if (currentPlate == null)
         {
             Debug.LogWarning("Nenhum prato no delivery para verificar.");
-            return false;
+            return null;
         }
 
-        var deliveredRecipes = currentPlate.GetStoredItemNames().ConvertAll(RemoveCloneFromName);
+        if (expectedRecipes == null)
+        {
+            Debug.LogError("expectedRecipes não foi inicializada.");
+            return null;
+        }
+
+        var storedItemNames = currentPlate.GetStoredItemNames();
+        if (storedItemNames == null)
+        {
+            Debug.LogError("currentPlate.GetStoredItemNames() retornou null.");
+            return null;
+        }
+
+        var deliveredRecipes = storedItemNames.ConvertAll(RemoveCloneFromName);
         Debug.Log($"Receitas entregues: {string.Join(", ", deliveredRecipes)}");
-        Debug.Log($"Receitas esperadas: {string.Join(", ", expectedRecipes)}");
+        Debug.Log($"Receitas esperadas: {string.Join(", ", expectedRecipes.ConvertAll(r => r?.recipeName ?? "null"))}");
 
         foreach (string deliveredRecipe in deliveredRecipes)
         {
-            if (expectedRecipes.Exists(r => NormalizeString(r.recipeName) == NormalizeString(deliveredRecipe)))
+            foreach (var expectedRecipe in expectedRecipes)
             {
-                Debug.Log("Receita encontrada! Entrega correta.");
-                return true;
+                if (expectedRecipe == null)
+                {
+                    Debug.LogWarning("Encontrado um RecipeSO null na lista expectedRecipes.");
+                    continue;
+                }
+
+                if (expectedRecipe.recipeName == null)
+                {
+                    Debug.LogWarning($"RecipeSO com nome null: {expectedRecipe}");
+                    continue;
+                }
+
+                if (NormalizeString(expectedRecipe.recipeName) == NormalizeString(deliveredRecipe))
+                {
+                    Debug.Log($"Receita encontrada! Entrega correta: {expectedRecipe.recipeName}");
+                    return expectedRecipe; // Retorna a receita entregue
+                }
             }
         }
 
         Debug.LogWarning("Nenhuma das receitas entregues corresponde a uma receita esperada.");
-        return false;
+        return null;
     }
 
     private string NormalizeString(string input)
@@ -118,9 +159,9 @@ public class DeliverySpot : MonoBehaviour
         return itemName.Replace("(Clone)", "").Trim();
     }
 
-    private void CompleteDelivery()
+    private void CompleteDelivery(RecipeSO deliveredRecipe)
     {
-        Debug.Log("Entrega completa! Receita entregue com sucesso.");
+        Debug.Log($"Entrega completa! Receita '{deliveredRecipe.recipeName}' entregue com sucesso.");
 
         if (currentPlate != null)
         {
@@ -128,9 +169,26 @@ public class DeliverySpot : MonoBehaviour
             currentPlate = null;
         }
 
-        if (expectedRecipes.Count > 0)
+        // Remove a receita entregue da lista expectedRecipes
+        if (expectedRecipes.Contains(deliveredRecipe))
         {
-            expectedRecipes.RemoveAt(0);
+            expectedRecipes.Remove(deliveredRecipe);
+            Debug.Log($"Receita '{deliveredRecipe.recipeName}' removida da lista de receitas esperadas.");
+        }
+        else
+        {
+            Debug.LogWarning($"Receita '{deliveredRecipe.recipeName}' não encontrada na lista de receitas esperadas.");
+        }
+
+        // Remove a receita entregue da lista waitingRecipeSOList
+        if (waitingRecipeSOList.Contains(deliveredRecipe))
+        {
+            waitingRecipeSOList.Remove(deliveredRecipe);
+            Debug.Log($"Receita '{deliveredRecipe.recipeName}' removida da lista de receitas aguardando.");
+        }
+        else
+        {
+            Debug.LogWarning($"Receita '{deliveredRecipe.recipeName}' não encontrada na lista de receitas aguardando.");
         }
     }
 

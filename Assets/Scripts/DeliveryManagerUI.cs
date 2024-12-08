@@ -36,7 +36,6 @@ public class DeliveryManagerUI : MonoBehaviour
 
         // Obtenha a lista de receitas que ainda faltam
         List<RecipeSO> waitingRecipes = deliverySpot.GetWaitingRecipeSOList();
-        Debug.Log($"Número de receitas na lista: {waitingRecipes.Count}");
 
         // Crie um elemento UI para cada receita com base no template
         foreach (RecipeSO recipe in waitingRecipes)
@@ -51,7 +50,6 @@ public class DeliveryManagerUI : MonoBehaviour
                 TextMeshProUGUI recipeNameText = recipeNameTransform.GetComponent<TextMeshProUGUI>();
                 if (recipeNameText != null)
                 {
-                    Debug.Log($"Configurando o nome da receita: {recipe.recipeName}");
                     recipeNameText.text = recipe.recipeName;
                 }
                 else
@@ -113,7 +111,6 @@ public class DeliveryManagerUI : MonoBehaviour
             Transform backgroundTransform = recipeUI.transform.Find("Background");
             if (backgroundTransform != null)
             {
-                Debug.Log("Background encontrado e configurado.");
             }
             else
             {
