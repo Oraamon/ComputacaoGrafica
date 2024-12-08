@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8ab4f54abc2bfb4d991ffeb8f469692, type: 3}
   m_Name: Burger
   m_EditorClassIdentifier: 
-  recipeName: 
-  ingredients: []
+  recipeName: Hamburger
+  ingredients:
+  - ingredientName: Carne
+    ingredientImage: {fileID: 21300000, guid: f1f50c7ef90b19741b26f2040806cf56, type: 3}
+  - ingredientName: Pao
+    ingredientImage: {fileID: 21300000, guid: 77b28124b8bda494381c80bd5aa42c22, type: 3}
