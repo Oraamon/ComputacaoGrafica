@@ -3,10 +3,39 @@ using UnityEngine;
 
 public class DeliverySpot : MonoBehaviour
 {
-    [SerializeField] private List<string> expectedRecipes;
+    [SerializeField] private List<RecipeSO> expectedRecipes;
+    [SerializeField] private RecipeListSO recipeListSO;
+    [SerializeField] private float spawnRecipeTimerMax = 4f;
+    [SerializeField] private int waitingRecipesMax = 5; 
+
     private Plate currentPlate;
+    private List<RecipeSO> waitingRecipeSOList;
+    private float spawnRecipeTimer;
 
     public Transform platePosition;
+
+    private void Awake()
+    {
+        waitingRecipeSOList = new List<RecipeSO>();
+        spawnRecipeTimer = spawnRecipeTimerMax;
+    }
+
+    private void Update()
+    {
+        spawnRecipeTimer -= Time.deltaTime;
+        if (spawnRecipeTimer <= 0f)
+        {
+            spawnRecipeTimer = spawnRecipeTimerMax;
+
+            if (waitingRecipeSOList.Count < waitingRecipesMax)
+            {
+                RecipeSO newRecipeSO = recipeListSO.recipeSOList[Random.Range(0, recipeListSO.recipeSOList.Count)];
+                Debug.Log($"Nova receita adicionada: {newRecipeSO.recipeName}");
+                waitingRecipeSOList.Add(newRecipeSO);
+                expectedRecipes.Add(newRecipeSO);
+            }
+        }
+    }
 
     public bool CanPlacePlate(Plate plate)
     {
@@ -44,7 +73,6 @@ public class DeliverySpot : MonoBehaviour
             Plate plateToRemove = currentPlate;
             currentPlate = null;
 
-            // Remove o prato do delivery e redefine sua posição
             plateToRemove.transform.SetParent(null);
 
             Debug.Log("Prato removido do delivery.");
@@ -63,26 +91,32 @@ public class DeliverySpot : MonoBehaviour
             return false;
         }
 
-        // Obtém os nomes normalizados dos itens no prato
         var deliveredRecipes = currentPlate.GetStoredItemNames().ConvertAll(RemoveCloneFromName);
-        Debug.LogWarning($"deliveredRecipes: {string.Join(", ", deliveredRecipes)}");
+        Debug.Log($"Receitas entregues: {string.Join(", ", deliveredRecipes)}");
+        Debug.Log($"Receitas esperadas: {string.Join(", ", expectedRecipes)}");
 
-        foreach (string recipe in expectedRecipes)
+        foreach (string deliveredRecipe in deliveredRecipes)
         {
-            if (!deliveredRecipes.Contains(recipe))
+            if (expectedRecipes.Exists(r => NormalizeString(r.recipeName) == NormalizeString(deliveredRecipe)))
             {
-                return false;
+                Debug.Log("Receita encontrada! Entrega correta.");
+                return true;
             }
         }
 
-        return deliveredRecipes.Count == expectedRecipes.Count;
+        Debug.LogWarning("Nenhuma das receitas entregues corresponde a uma receita esperada.");
+        return false;
+    }
+
+    private string NormalizeString(string input)
+    {
+        return input.ToLower().Trim();
     }
 
     private string RemoveCloneFromName(string itemName)
     {
         return itemName.Replace("(Clone)", "").Trim();
     }
-
 
     private void CompleteDelivery()
     {
@@ -93,5 +127,15 @@ public class DeliverySpot : MonoBehaviour
             Destroy(currentPlate.gameObject);
             currentPlate = null;
         }
+
+        if (expectedRecipes.Count > 0)
+        {
+            expectedRecipes.RemoveAt(0);
+        }
+    }
+
+    public List<RecipeSO> GetWaitingRecipeSOList()
+    {
+        return waitingRecipeSOList;
     }
 }
