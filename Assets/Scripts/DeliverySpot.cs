@@ -7,6 +7,7 @@ public class DeliverySpot : MonoBehaviour
     [SerializeField] private RecipeListSO recipeListSO;
     [SerializeField] private float spawnRecipeTimerMax = 4f;
     [SerializeField] private int waitingRecipesMax = 5; 
+    [SerializeField] private PointsManagerUI pointsManager;
 
     private Plate currentPlate;
     private List<RecipeSO> waitingRecipeSOList;
@@ -162,6 +163,16 @@ public class DeliverySpot : MonoBehaviour
     private void CompleteDelivery(RecipeSO deliveredRecipe)
     {
         Debug.Log($"Entrega completa! Receita '{deliveredRecipe.recipeName}' entregue com sucesso.");
+        pointsManager = FindObjectOfType<PointsManagerUI>();
+
+        if (pointsManager != null)
+        {
+            pointsManager.AddPoints(250); // Chama a função para adicionar pontos
+        }
+        else
+        {
+            Debug.LogError("PointsManagerUI não encontrado na cena!");
+        }
 
         if (currentPlate != null)
         {

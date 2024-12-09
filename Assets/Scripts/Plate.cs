@@ -10,8 +10,8 @@ public class Plate : MonoBehaviour
     [SerializeField] private int maxItems = 5; // Número máximo de itens no prato
     private bool canAddItems = false; // Flag para permitir ou não adicionar itens
 
-    [Header("Receitas")]
-    [SerializeField] private List<CombinationsSO> combinationsList; // Lista de combinações disponíveis
+    [Header("Prefabs")]
+    [SerializeField] private GameObject carneFritaPrefab; // Prefab para "Carne Frita"
 
     private List<GameObject> storedItems = new List<GameObject>(); // Lista de itens armazenados no prato
 
@@ -21,12 +21,6 @@ public class Plate : MonoBehaviour
         if (itemDisplayPosition == null)
         {
             Debug.LogError("ItemDisplayPosition não está atribuído no Inspector.");
-        }
-
-        // Verifica se a lista de combinações foi atribuída
-        if (combinationsList == null || combinationsList.Count == 0)
-        {
-            Debug.LogWarning("Nenhuma combinação atribuída na lista de combinações.");
         }
     }
 
@@ -64,81 +58,45 @@ public class Plate : MonoBehaviour
     }
 
     /// <summary>
-    /// Verifica se a combinação de itens no prato corresponde a alguma receita definida em combinationsList
+    /// Verifica se a combinação de itens no prato corresponde a uma receita
     /// </summary>
     private void CheckForRecipe()
     {
-        foreach (CombinationsSO combination in combinationsList)
+        bool hasQueijo = false;
+        bool hasCarne = false;
+
+        foreach (GameObject item in storedItems)
         {
-            bool match = true;
-            List<string> plateIngredients = GetStoredItemNames();
-
-            foreach (CombinationsSO.Ingredient ingredient in combination.ingredients)
+            if (item.name.Contains("Queijo"))
             {
-                bool ingredientFound = false;
-                foreach (string plateIngredient in plateIngredients)
-                {
-                    if (plateIngredient.StartsWith(ingredient.ingredientName, System.StringComparison.OrdinalIgnoreCase))
-                    {
-                        ingredientFound = true;
-                        break;
-                    }
-                }
-
-                if (!ingredientFound)
-                {
-                    match = false;
-                    break;
-                }
+                hasQueijo = true;
             }
-
-            if (match)
+            else if (item.name.Contains("Carne"))
             {
-                // Combinação encontrada
-                Debug.Log($"Receita '{combination.recipeName}' completada!");
-
-                // Remover os ingredientes utilizados do prato
-                foreach (CombinationsSO.Ingredient ingredient in combination.ingredients)
-                {
-                    RemoveIngredientByName(ingredient.ingredientName);
-                }
-
-                // Instanciar o prefab resultante no itemDisplayPosition
-                GameObject newItem = Instantiate(combination.resultPrefab, itemDisplayPosition);
-                newItem.transform.localPosition = Vector3.zero;
-                newItem.transform.localRotation = Quaternion.identity;
-
-                storedItems.Add(newItem);
-                newItem.tag = "StoredOnPlate";
-
-                ArrangeItems(); // Reorganiza os itens após a criação da nova receita
-
-                // Opcional: Se uma combinação for encontrada, interrompe a verificação para evitar múltiplas receitas simultâneas
-                return;
+                hasCarne = true;
             }
         }
 
-        Debug.Log("Nenhuma combinação encontrada para os ingredientes no prato.");
-    }
-
-    /// <summary>
-    /// Remove um ingrediente específico do prato pelo nome, ignorando o sufixo "(Clone)" se presente.
-    /// </summary>
-    /// <param name="ingredientName">Nome do ingrediente a ser removido</param>
-    private void RemoveIngredientByName(string ingredientName)
-    {
-        GameObject itemToRemove = storedItems.Find(item => 
-            item.name.StartsWith(ingredientName, System.StringComparison.OrdinalIgnoreCase));
-
-        if (itemToRemove != null)
+        if (hasQueijo && hasCarne)
         {
-            storedItems.Remove(itemToRemove);
-            Destroy(itemToRemove);
-            Debug.Log($"Ingrediente '{ingredientName}' removido do prato.");
-        }
-        else
-        {
-            Debug.LogWarning($"Ingrediente '{ingredientName}' não encontrado no prato.");
+            // Destroi todos os itens atuais no prato
+            foreach (GameObject storedItem in storedItems)
+            {
+                Destroy(storedItem);
+            }
+            storedItems.Clear();
+
+            Debug.Log("Carne assada feita");
+
+            // Instancia o prefab da Carne Frita no itemDisplayPosition
+            GameObject newItem = Instantiate(carneFritaPrefab, itemDisplayPosition);
+            newItem.transform.localPosition = Vector3.zero;
+            newItem.transform.localRotation = Quaternion.identity;
+
+            storedItems.Add(newItem);
+            newItem.tag = "StoredOnPlate";
+
+            ArrangeItems(); // Reorganiza os itens após a criação da nova receita
         }
     }
 
@@ -220,21 +178,15 @@ public class Plate : MonoBehaviour
     }
 
     /// <summary>
-    /// Obtém os nomes dos itens armazenados no prato, removendo o sufixo "(Clone)" se presente.
+    /// Obtém os nomes dos itens armazenados no prato
     /// </summary>
-    /// <returns>Lista de nomes dos itens sem o sufixo "(Clone)"</returns>
+    /// <returns>Lista de nomes dos itens</returns>
     public List<string> GetStoredItemNames()
     {
         List<string> itemNames = new List<string>();
         foreach (GameObject item in storedItems)
         {
-            string name = item.name;
-            // Remove o sufixo "(Clone)" se estiver presente
-            if (name.EndsWith("(Clone)"))
-            {
-                name = name.Replace("(Clone)", "").Trim();
-            }
-            itemNames.Add(name);
+            itemNames.Add(item.name);
         }
         return itemNames;
     }
