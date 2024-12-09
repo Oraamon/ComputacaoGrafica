@@ -15,4 +15,4 @@ MonoBehaviour:
   recipeName: Carne Assada
   ingredients:
   - ingredientName: Carne Crua
-    ingredientImage: {fileID: 21300000, guid: aa1bacc24dde76e47b2ec0dd4e82385b, type: 3}
+    ingredientImage: {fileID: 21300000, guid: f1f50c7ef90b19741b26f2040806cf56, type: 3}

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cbf923dd5fc7594aab560903e88d238, type: 3}
+  m_Name: ArrozFeijoadaSO
+  m_EditorClassIdentifier: 
+  recipeName: Feijoada com Arroz
+  resultPrefab: {fileID: 3023722078074049546, guid: f877cd1bee5bfe749aa75f6f566d0afd, type: 3}
+  ingredients:
+  - ingredientName: Arroz Cozido
+    ingredientImage: {fileID: 0}
+  - ingredientName: Feijoada
+    ingredientImage: {fileID: 0}
