@@ -85,11 +85,14 @@ public class BlinkingEffect : MonoBehaviour
             // Adicionar o material de outline
             foreach (var renderer in objRenderers)
             {
-                var materials = new List<Material>(renderer.materials);
-                if (!materials.Contains(outlineMaterial))
+                if (renderer != null)
                 {
-                    materials.Add(outlineMaterial);
-                    renderer.materials = materials.ToArray();
+                    var materials = new List<Material>(renderer.materials);
+                    if (!materials.Contains(outlineMaterial))
+                    {
+                        materials.Add(outlineMaterial);
+                        renderer.materials = materials.ToArray();
+                    }
                 }
             }
             yield return new WaitForSeconds(blinkInterval);
@@ -97,14 +100,18 @@ public class BlinkingEffect : MonoBehaviour
             // Remover o material de outline
             foreach (var renderer in objRenderers)
             {
-                var materials = new List<Material>(renderer.materials);
-                if (materials.Contains(outlineMaterial))
+                if (renderer != null)
                 {
-                    materials.Remove(outlineMaterial);
-                    renderer.materials = materials.ToArray();
+                    var materials = new List<Material>(renderer.materials);
+                    if (materials.Contains(outlineMaterial))
+                    {
+                        materials.Remove(outlineMaterial);
+                        renderer.materials = materials.ToArray();
+                    }
                 }
             }
             yield return new WaitForSeconds(blinkInterval);
         }
     }
+
 }
